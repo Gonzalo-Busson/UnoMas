@@ -34,6 +34,11 @@ public class NotificationFacade {
         notificarATodos(usuarios, message);
     }
 
+    public void sendNotificationPartidoConfirmado(List<Usuario> usuarios) {
+       Message message = new Message("El partido ha sido confirmado");
+       notificarATodos(usuarios, message);
+   }
+
 
    public void notificarATodos(List<Usuario> usuarios, Message message) {
        for (Usuario usuario : usuarios) {

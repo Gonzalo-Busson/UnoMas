@@ -1,9 +1,6 @@
 package com.company.neovest.qa.controller;
 
-import com.company.neovest.qa.Deporte;
-import com.company.neovest.qa.GeoLocation;
-import com.company.neovest.qa.Nivel;
-import com.company.neovest.qa.Usuario;
+import com.company.neovest.qa.*;
 import com.company.neovest.qa.service.UsuarioService;
 
 import java.util.ArrayList;
@@ -44,4 +41,7 @@ public class ControllerUsuario {
     }
 
 
+    public void confirmarPartido(Partido partido, Usuario juanito) {
+        partido.confirmar(juanito);
+    }
 }

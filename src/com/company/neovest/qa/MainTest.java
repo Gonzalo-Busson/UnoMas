@@ -5,6 +5,7 @@ import com.company.neovest.qa.controller.ControllerUsuario;
 import com.company.neovest.qa.state.Armado;
 import com.company.neovest.qa.state.Cancelado;
 import com.company.neovest.qa.state.EnJuego;
+import com.company.neovest.qa.state.NecesitandoJugadores;
 import com.company.neovest.qa.strategy.HabilidadDelJugador;
 import com.company.neovest.qa.strategy.ProximidadDelJugador;
 import org.junit.jupiter.api.Test;
@@ -68,8 +69,7 @@ class MainTest {
         cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
         Partido partidoTenis = cp.getPartidos().get(0);
         cp.unirseAPartido(cu.getUsuarios().get(1),partidoTenis);
-        cp.actualizarPartido(partidoTenis, new EnJuego());
-        assertTrue(partidoTenis.getState() instanceof EnJuego,
+        assertTrue(partidoTenis.getState() instanceof Armado,
                 "El estado del partido no esta en estado EnJuego");
     }
 
@@ -136,6 +136,53 @@ class MainTest {
                 "La estrategia de emparejamiento no esta en estado Cancelado"
         );
     }
+
+
+    @Test
+    public void login(){
+        cu.crearUsuario("Juanito","1234","juanito@gmail.com",new GeoLocation(40,50));
+        cu.crearUsuario("Luchito","1234","luchito@gmail.com",new GeoLocation(40,40));
+        Usuario juanito = cu.getUsuarios().get(0);
+        cu.loginUsuario(juanito.getNombre(),juanito.getPassword());
+        cu.loginUsuario("carlos",juanito.getPassword());
+    }
+
+    @Test
+    public void confirmarPartido(){
+        cu.crearUsuario("Juanito","1234","juanito@gmail.com",new GeoLocation(40,50));
+        cu.crearUsuario("Luchito","1234","luchito@gmail.com",new GeoLocation(40,40));
+        Usuario juanito = cu.getUsuarios().get(0);
+        Usuario luchito = cu.getUsuarios().get(1);
+        Deporte tennis = new Deporte("tennis","1",2);
+        cu.agregarDeporteFavorito(juanito,tennis,Nivel.INTERMEDIO);
+        cu.agregarDeporteFavorito(luchito,tennis,Nivel.INTERMEDIO);
+        cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
+        Partido partidoTenis = cp.getPartidos().get(0);
+        cp.unirseAPartido(cu.getUsuarios().get(1),partidoTenis);
+        cu.confirmarPartido(partidoTenis,juanito);
+        cu.confirmarPartido(partidoTenis,luchito);
+    }
+
+    @Test
+    public void eliminarJugador(){
+        cu.crearUsuario("Juanito","1234","juanito@gmail.com",new GeoLocation(40,50));
+        cu.crearUsuario("Luchito","1234","luchito@gmail.com",new GeoLocation(40,40));
+        Usuario juanito = cu.getUsuarios().get(0);
+        Usuario luchito = cu.getUsuarios().get(1);
+        Deporte tennis = new Deporte("tennis","1",2);
+        cu.agregarDeporteFavorito(juanito,tennis,Nivel.INTERMEDIO);
+        cu.agregarDeporteFavorito(luchito,tennis,Nivel.INTERMEDIO);
+        cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
+        Partido partidoTenis = cp.getPartidos().get(0);
+        cp.unirseAPartido(cu.getUsuarios().get(1),partidoTenis);
+        cu.confirmarPartido(partidoTenis,juanito);
+        cu.confirmarPartido(partidoTenis,luchito);
+        partidoTenis.eliminarJugador(luchito);
+        assertTrue(partidoTenis.getState() instanceof NecesitandoJugadores,
+            "El partido no se encuentra en estado NecesitandoJugadores después de que Juanito se ha retirado"
+        );
+    }
+
 
 
 

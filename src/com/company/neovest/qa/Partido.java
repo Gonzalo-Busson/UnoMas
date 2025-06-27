@@ -23,6 +23,7 @@ public class Partido {
         this.estrategiaDeEmparejamiento = new ProximidadDelJugador();
         this.jugadoresActuales = new ArrayList<>();
         this.jugadoresActuales.add(organizador);
+        this.confirmados = new int[getNumeroJugadores()];
     }
 
     private String id;
@@ -35,6 +36,7 @@ public class Partido {
     private List<Usuario> jugadoresActuales;
     private List<IObserver> observers;
     private IStrategy estrategiaDeEmparejamiento;
+    private int[] confirmados;
 
     public String getId() {
         return id;
@@ -61,6 +63,8 @@ public class Partido {
         if (state instanceof NecesitandoJugadores) {
         } else if (state instanceof Armado) {
             notificacion.sendNotificationPartidoEnArmado(this.getJugadoresActuales());
+        } else if (state instanceof Confirmado) {
+            notificacion.sendNotificationPartidoConfirmado(this.getJugadoresActuales());
         } else if (state instanceof EnJuego) {
             notificacion.sendNotificationPartidoEnJuego(this.getJugadoresActuales());
         } else if (state instanceof Finalizado) {
@@ -130,17 +134,25 @@ public class Partido {
 
 
     }
+    public void confirmar(Usuario jugador){
+      if (jugadoresActuales.contains(jugador)) {
+          int index = jugadoresActuales.indexOf(jugador);
+              confirmados[index] = 1; // Asignar 1 para indicar que el jugador está confirmado
+              puedeEmpezar();
+      }
+      if (puedeEmpezar()){
+          setState(new Confirmado());
+      }
+    }
 
     public  void eliminarJugador(Usuario jugador){
         if (jugadoresActuales == null || !jugadoresActuales.contains(jugador)) {
             System.out.println("El jugador no está en la lista de jugadores actuales.");
         }
         if (jugadoresActuales.contains(jugador)){
-            jugadoresActuales.remove(jugador);
-            NotificationFacade notificacion = new NotificationFacade();
-            notificacion.sendNotificationPartidoNecesitandoJugadores(this.getJugadoresActuales());
-            System.out.println("Partido NecesitandoJugadores. Jugadores actuales: " + jugadoresActuales.size() + "/" + deporte.getNumeroJugadores());
-
+            int index = jugadoresActuales.indexOf(jugador);
+            confirmados[index] = 0;// Asignar 0 para indicar que el jugador no está confirmado
+            setState(new NecesitandoJugadores());
         }
 
     }
@@ -154,5 +166,13 @@ public class Partido {
         this.observers = observers;
     }
 
-
+    public boolean puedeEmpezar() {
+        boolean flag = true;
+        for (int num : confirmados) {
+            if (num == 0) {
+                return false; // Si al menos un jugador no está confirmado, el partido no puede empezar
+            }
+        }
+        return flag;
+    }
 }
