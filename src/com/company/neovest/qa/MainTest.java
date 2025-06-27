@@ -3,6 +3,7 @@ package com.company.neovest.qa;
 import com.company.neovest.qa.controller.ControllerPartido;
 import com.company.neovest.qa.controller.ControllerUsuario;
 import com.company.neovest.qa.state.Armado;
+import com.company.neovest.qa.state.Cancelado;
 import com.company.neovest.qa.state.EnJuego;
 import com.company.neovest.qa.strategy.HabilidadDelJugador;
 import com.company.neovest.qa.strategy.ProximidadDelJugador;
@@ -38,6 +39,7 @@ class MainTest {
         Usuario luchito = cu.getUsuarios().get(1);
         Deporte tennis = new Deporte("tennis","1",2);
         cu.agregarDeporteFavorito(juanito,tennis,Nivel.INTERMEDIO);
+        cu.agregarDeporteFavorito(luchito,tennis,Nivel.INTERMEDIO);
         cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
         Partido partidoTenis = cp.getPartidos().get(0);
         cp.unirseAPartido(cu.getUsuarios().get(1),partidoTenis);
@@ -62,6 +64,7 @@ class MainTest {
         Usuario luchito = cu.getUsuarios().get(1);
         Deporte tennis = new Deporte("tennis","1",2);
         cu.agregarDeporteFavorito(juanito,tennis,Nivel.INTERMEDIO);
+        cu.agregarDeporteFavorito(luchito,tennis,Nivel.INTERMEDIO);
         cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
         Partido partidoTenis = cp.getPartidos().get(0);
         cp.unirseAPartido(cu.getUsuarios().get(1),partidoTenis);
@@ -114,5 +117,26 @@ class MainTest {
         System.out.println("Partidos cercanos a Benito: " + cp.buscarPartidos(benito).size());
         System.out.println("Partidos cercanos a Luchito: " + cp.buscarPartidos(luchito).size());
     }
+
+    @Test
+    public void cancelarPartido(){
+        cu.crearUsuario("Juanito","1234","juanito@gmail.com",new GeoLocation(40,50));
+        cu.crearUsuario("Luchito","1234","luchito@gmail.com",new GeoLocation(40,40));
+        Usuario juanito = cu.getUsuarios().get(0);
+        Usuario luchito = cu.getUsuarios().get(1);
+        Deporte tennis = new Deporte("tennis","1",2);
+        cu.agregarDeporteFavorito(juanito,tennis,Nivel.INTERMEDIO);
+        cu.agregarDeporteFavorito(luchito,tennis,Nivel.INTERMEDIO);
+
+        cp.crearPartido(new Date(),10,new GeoLocation(35,45),tennis,juanito);
+        Partido partidoTenis = cp.getPartidos().get(0);
+        partidoTenis.setState(new Cancelado());
+        assertTrue(
+                partidoTenis.getState() instanceof Cancelado,
+                "La estrategia de emparejamiento no esta en estado Cancelado"
+        );
+    }
+
+
 
 }

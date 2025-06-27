@@ -31,12 +31,16 @@ public class ControllerPartido {
         List<Usuario> usuariosANotificar= new ArrayList<>();
         for (Usuario usuario:us.getUsuarios()
              ) {
-            if (deporte.getNombre()==usuario.getDeporte().getNombre()){
-                usuariosANotificar.add(usuario);
-            }
+            if (usuario.getDeporte() != null) {
+                if (deporte.getNombre()==usuario.getDeporte().getNombre()){
+                    usuariosANotificar.add(usuario);
+                }
+            } // Skip users without a sport
         }
-        NotificationFacade notificacion = new NotificationFacade();
-        notificacion.sendNotificationPartidoNecesitandoJugadores(usuariosANotificar);
+        if (!usuariosANotificar.isEmpty()){
+            NotificationFacade notificacion = new NotificationFacade();
+            notificacion.sendNotificationPartidoNecesitandoJugadores(usuariosANotificar);
+        }
     }
 
     public void configurarEstrategiaDeEmparejamiento(Partido partido,IStrategy estrategiaDeEmparejamiento){
